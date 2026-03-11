@@ -1,13 +1,13 @@
-const Database = require('better-sqlite3');
+const { DatabaseSync } = require('node:sqlite');
 const path = require('path');
 
 const DB_PATH = path.join(__dirname, 'demands.db');
 
-const db = new Database(DB_PATH);
+const db = new DatabaseSync(DB_PATH);
 
 // Habilitar WAL mode para melhor performance
-db.pragma('journal_mode = WAL');
-db.pragma('foreign_keys = ON');
+db.exec('PRAGMA journal_mode = WAL');
+db.exec('PRAGMA foreign_keys = ON');
 
 // Criar tabela de demandas
 db.exec(`

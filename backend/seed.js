@@ -145,8 +145,9 @@ if (existingCount === 0) {
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
 
-  const insertMany = db.transaction((items) => {
-    for (const item of items) {
+  db.exec('BEGIN TRANSACTION');
+  try {
+    for (const item of demands) {
       stmt.run(
         item.title, item.description, item.type, item.subtype,
         item.status, item.priority, item.area, item.requester,
@@ -154,9 +155,12 @@ if (existingCount === 0) {
         item.completed_date || null, item.notes
       );
     }
-  });
+    db.exec('COMMIT');
+  } catch (e) {
+    db.exec('ROLLBACK');
+    throw e;
+  }
 
-  insertMany(demands);
   console.log(`✅ ${demands.length} demandas de exemplo inseridas com sucesso!`);
 } else {
   console.log(`ℹ️  Banco já contém ${existingCount} demandas. Seed ignorado.`);
